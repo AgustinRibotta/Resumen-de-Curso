@@ -1,0 +1,5 @@
+h1{ 
+    text-decoration-line: underline; /* Recuadro al rededor de los h1 */
+    border: 1px solid red ;
+    color: forestgreen;
+}

@@ -14,11 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from AppCoder.views import curso, lista_curso
+from django.urls import path, include  # Con el inclde hacemos ruteo a las distintas aplicaciones y sus url.
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('curso/<nombre>/<camada>',curso),
-    path('lista_curso/',lista_curso),
+    path('app-code/', include('AppCoder.urls')), # De esta manera mandamos a llamar esos archivos.
 ]
