@@ -31,7 +31,9 @@ def inicio(request):
 
 def cursos(request):
 
-    return render(request,"curso.html")
+    lista = Curso.objects.all()
+
+    return render(request,"curso.html",{"lista_curso":lista})
 
 def profesores(request):
 

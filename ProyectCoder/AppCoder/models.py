@@ -7,6 +7,9 @@ class Curso(models.Model):  # De esta froma heredamos los modelos de la clase mo
     nombre = models.CharField(max_length=50) # Creamo un objeto del tipo charfild.
     camada = models.IntegerField()
 
+    def __str__(self):
+        return f'{self.nombre} - {self.camada}'
+
 class Estudiante(models.Model):
 
     nombre = models.CharField(max_length=50)
