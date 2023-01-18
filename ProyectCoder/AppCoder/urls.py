@@ -4,12 +4,11 @@ from .views import curso, lista_curso, profesores, estudiantes, entregables, cur
 
 urlpatterns = [
     path('curso/<nombre>/<camada>',curso),
-    path('',inicio),
+    path('',inicio, name ="Inicio"),
     path('lista_curso/',lista_curso),
-    path('cursos/',curso, name="Cursos"), # El tercer atributo nos permite inhdicar en el html a donde nos vamos a dirifir
-    path('profesores/',profesores),
-    path('estudiantes/',estudiantes),
-    path('entregables/',entregables),
-    
+    path('cursos/',cursos, name="Cursos"), # El tercer atributo nos permite inhdicar en el html a donde nos vamos a dirifir
+    path('profesores/',profesores, name="Profesores" ),
+    path('estudiantes/',estudiantes, name="Estudiantes"),
+    path('entregables/',entregables, name="Entregas"),    
 ]
 
