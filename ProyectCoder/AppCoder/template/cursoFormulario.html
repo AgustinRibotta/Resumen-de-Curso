@@ -1,0 +1,28 @@
+{% extends 'padre.html' %}
+
+{% load static %}
+
+{% block contenidoqueCambia %}
+<!--action le decimos la url , method como lo mandamos csrf_token para validar el formulario.-->
+<form action= "{% url 'CursoFormulario' %}" method="POST" >{% csrf_token %} 
+
+    {{mi_formulario.as_p}}
+    
+     <!--Generamos el boton de envio.-->
+    <input type="submit" value="Enviar"/>
+</form>
+{% endblock contenidoqueCambia %}
+ 
+
+<!--action le decimos la url , method como lo mandamos csrf_token para validar el formulario.
+<form action= "{% url 'CursoFormulario' %}" method="POST" >{% csrf_token %} 
+
+    Creamos el  formulario, pero no se envian a la base de datos.
+   <p>Curso: <input type="text" name="curso"/></p>
+
+   <p>Camada: <input type="number" name="camada"/></p>
+   
+    Generamos el boton de envio.
+   <input type="submit" value="Enviar"/>
+</form>
+--->

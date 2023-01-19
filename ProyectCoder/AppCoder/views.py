@@ -1,6 +1,7 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Curso
+from .forms import CursoFormulario
 # Create your views here.
 
 # De esta manera igresamos datos en nuestra base de datos.
@@ -47,3 +48,35 @@ def entregables(request):
 
     return render(request,"entregables.html")
     
+def cursoFormulario(request):  # Creamos la funciojn formularios.
+
+    if request.method == "POST" :
+        
+        mi_formulario = CursoFormulario(request.POST) # Agregamos los formularios de Django.
+
+        if mi_formulario.is_valid(): # Validacion del forulario.
+
+            data = mi_formulario.cleaned_data
+            curso = Curso(nombre=data['nombre'], camada=data['camada']) # Cargamos los datos del formulario
+            curso.save()
+
+        return redirect('Cursos') 
+        
+    else:
+        
+        mi_formulario = CursoFormulario()
+    return render (request,"cursoFormulario.html",{"mi_formulario": mi_formulario})
+
+def busqueda_camada (reques): # creamos la busqueda de cursos.
+
+    return render(reques,'busqueda_camada.html')
+
+def buscar (reques): # Realizamos la busqueda.
+
+    camada_buscada = reques.GET["camada"]
+
+    curso = Curso.objects.get(camada = camada_buscada)
+
+    return render (reques, 'resultadoBusqeueda.html', {'curso':curso,'camada':camada_buscada})
+
+

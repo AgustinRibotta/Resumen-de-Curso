@@ -1,0 +1,15 @@
+{% extends 'padre.html' %}
+
+{% load static %}
+
+{% block contenidoqueCambia %}
+<!--action le decimos la url , method como lo mandamos csrf_token para validar el formulario.-->
+<form action= "{% url 'Buscar' %}" method="GET" >{% csrf_token %} 
+
+    <p>Ingrese el numero de camada:  <input type="number" name="camada"/> </p>
+
+    <input type="submit" value="Buscar">
+
+</form>
+{% endblock contenidoqueCambia %}
+ 
