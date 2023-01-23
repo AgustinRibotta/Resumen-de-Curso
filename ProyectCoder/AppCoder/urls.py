@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
-from .views import curso, lista_curso, profesores, estudiantes, entregables, cursos, inicio, cursoFormulario, busqueda_camada, buscar, lista_profesores,crea_profesor,eliminarProfesor
+from .views import curso, lista_curso, profesores, estudiantes, entregables, cursos, inicio, cursoFormulario, busqueda_camada, buscar,lista_profesores,crea_profesor,eliminarProfesor, edita_profesor, CursoList, CursoDetail, CursoCreate, CursoUpdate, CursoDelete
+
 
 urlpatterns = [
     path('curso/<nombre>/<camada>',curso),
@@ -16,5 +17,12 @@ urlpatterns = [
     path('listaProfesores/', lista_profesores, name = 'ListaProfesores'), # Lee los archivos de la base de datos.
     path('crea_profesor/', crea_profesor, name = 'CreaProfesor'),
     path('elimina_profesor/<int:id>', eliminarProfesor, name = 'EliminaProfesor'),
+    path('editar_profesor/<int:id>', edita_profesor, name = 'EditarProfesor'),
+    path('listaCurso/', CursoList.as_view(), name = 'ListaCursos'),
+    path('detalleCurso/<pk>', CursoDetail.as_view(), name = 'DetallCurso'),
+    path('creaCurso/', CursoCreate.as_view(), name = 'CreaCurso'),
+    path('actualizarCurso/<pk>', CursoUpdate.as_view(), name = 'ActualizarCursos'),
+    path('eliminarCurso/<pk>', CursoDelete.as_view(), name = 'EliminaCurso'),  
+                                                                                        
 ]
 

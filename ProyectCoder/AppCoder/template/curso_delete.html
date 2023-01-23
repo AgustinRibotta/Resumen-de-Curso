@@ -1,0 +1,16 @@
+{% extends 'padre.html' %}
+
+{% load static %}
+
+{% block contenidoqueCambia %}
+<!--action le decimos la url , method como lo mandamos csrf_token para validar el formulario.-->
+<form method="POST" >{% csrf_token %} 
+
+    <p>Este seguro que desea eliminar el registro?</p>
+    
+     <!--Generamos el boton de envio.-->
+    <button type="submit">Confiramr </button>
+    <button><a href="{% url 'Inicio' %}">Denegar</a></button>
+</form>
+{% endblock contenidoqueCambia %}
+ 

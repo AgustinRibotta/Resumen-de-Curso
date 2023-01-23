@@ -1,0 +1,15 @@
+{% extends 'padre.html' %}
+
+{% load static %}
+
+{% block contenidoqueCambia %}
+<!--action le decimos la url , method como lo mandamos csrf_token para validar el formulario.-->
+<form action= "{% url 'CreaCurso' %}" method="POST" >{% csrf_token %} 
+
+    {{form.as_p}} <!--Define el contexto-->
+    
+     <!--Generamos el boton de envio.-->
+    <input type="submit" value="Enviar"/>
+</form>
+{% endblock contenidoqueCambia %}
+ 

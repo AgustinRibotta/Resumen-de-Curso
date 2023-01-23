@@ -13,9 +13,14 @@
                 {{profesor}}
             </li>
             <div>
+                 <!--De esta manera llamo la ide del profesor particular ya que estoy en un bucle for-->
                 <form action= "{% url 'EliminaProfesor' profesor.id %}" method="POST" >{% csrf_token %} 
                     <button type="submit">Eliminar</button>
                 </form>
+
+                <button>
+                    <a href="{% url 'EditarProfesor' profesor.id %}"> Editar</a> <!--Metodo get.-->
+                </button>
             </div>
         {% endfor %}
             
