@@ -15,9 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include  # Con el inclde hacemos ruteo a las distintas aplicaciones y sus url.
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('app-code/', include('AppCoder.urls')), # De esta manera mandamos a llamar esos archivos.
 ]
+
+urlpatterns+= static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # De esta manera le permitimos cargar imagenes.

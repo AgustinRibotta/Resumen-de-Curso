@@ -1,7 +1,7 @@
 <!-- De este archivo vamos a sacar lo qque el se mantenga en todas las url-->
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
     <head>
         {% load static %}
         <meta charset="utf-8" />
@@ -22,14 +22,25 @@
     <body>
         <!-- Navigation-->
         <nav class="navbar navbar-light bg-light static-top">
-            <div class="container">
+            <div class="container"> 
+
                 <a class="navbar-brand" href="{% url 'Inicio' %}">Inicio</a>
-                <a class="navbar-brand" href="{% url 'Profesores' %}">Profesores</a>
+                {% if request.user.profesor %}
+                    <a class="navbar-brand" href="{% url 'Profesores' %}">Profesores</a>
+                {% endif %}
                 <a class="navbar-brand" href="{% url 'Cursos' %}">Curso</a>
                 <a class="navbar-brand" href="{% url 'Estudiantes' %}">Estudiante</a>
                 <a class="navbar-brand" href="{% url 'Entregas' %}">Entregable</a>
                 <a class="navbar-brand" href="{% url 'CursoFormulario' %}">CursoFormulario</a>
                 <a class="navbar-brand" href="{% url 'BusquedaCamada' %}">BusquedaCamada</a>
+                
+                {% if user.is_authenticated %}
+                    <p>Bienvenido {{user.username}}</p>
+                    <a class="btn btn-primary" href="{% url 'Login' %}">Salir</a>
+                {% else %}
+                    <a class="btn btn-primary" href="{% url 'Login' %}">Inicio</a>
+                {% endif %}
+                
             </div>
         </nav>
         <!-- Masthead-->

@@ -1,6 +1,16 @@
 from django.contrib import admin
 from django.urls import path
-from .views import curso, lista_curso, profesores, estudiantes, entregables, cursos, inicio, cursoFormulario, busqueda_camada, buscar,lista_profesores,crea_profesor,eliminarProfesor, edita_profesor, CursoList, CursoDetail, CursoCreate, CursoUpdate, CursoDelete
+from django.contrib.auth.views import LogoutView
+from .views import (curso, 
+                    lista_curso, 
+                    profesores, 
+                    estudiantes, 
+                    entregables, 
+                    cursos, inicio, 
+                    cursoFormulario, 
+                    busqueda_camada, buscar,lista_profesores,crea_profesor,eliminarProfesor, edita_profesor, CursoList, CursoDetail, CursoCreate, CursoUpdate, 
+                    CursoDelete, loginView,register,
+                    editar_perfil)
 
 
 urlpatterns = [
@@ -23,6 +33,9 @@ urlpatterns = [
     path('creaCurso/', CursoCreate.as_view(), name = 'CreaCurso'),
     path('actualizarCurso/<pk>', CursoUpdate.as_view(), name = 'ActualizarCursos'),
     path('eliminarCurso/<pk>', CursoDelete.as_view(), name = 'EliminaCurso'),  
-                                                                                        
-]
+    path('login/',loginView, name = 'Login'),
+    path('registre/',register, name = 'Registrar'),            
+    path('logout/',LogoutView.as_view(template_name='logout.html'), name = 'Logout'),  
+    path('editar-perfil/',editar_perfil, name = 'EditarPerfil'),
+]   
 

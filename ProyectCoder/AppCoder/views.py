@@ -1,10 +1,15 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from .models import Curso, Profesor
-from .forms import CursoFormulario, ProfesorFormulario
-from django.views.generic import ListView
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import DeleteView, UpdateView, CreateView
+from .models import Curso, Profesor, Avatar
+from .forms import CursoFormulario, ProfesorFormulario,UserChangeForm, UserEditForm, UserRegisterForm
+from django.views.generic import ListView # Importamos vista de lista
+from django.views.generic.detail import DetailView # Detalles de lista
+from django.views.generic.edit import DeleteView, UpdateView, CreateView # Crear - Eliminar - Actualizar
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm # Formulario para login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 
 # Create your views here.
 
@@ -25,18 +30,21 @@ def curso(request,nombre,camada):
 
 def lista_curso(request):
 
+    avatar = Avatar.objects.get(user=request.user)
     lista = Curso.objects.all()
 
-    return render(request,"lista_curso.html",{"lista_curso":lista})
+    return render(request,"lista_curso.html",{"lista_curso":lista},{'url': avatar.imagen.url}) # Para que nos traiga la imagen.
 
 
 def inicio(request):
 
     return render(request,"inicio.html")
 
+
+@login_required  #  Restringimos el acceso a toda persona que no este logeada.
 def cursos(request):
 
-    lista = Curso.objects.all()
+    lista = Curso.objects.filter(profesor_curso__nombre = 'Cristino') # Tiramos todos los cursos de un profesor.
 
     return render(request,"curso.html",{"lista_curso":lista})
 
@@ -90,10 +98,18 @@ def buscar (reques): # Realizamos la busqueda.
 # Read - Recuperamos toda la lista de profesores.
 
 def lista_profesores(request):
+    try:
+        if request.user.profesor:
 
-    profesores = Profesor.objects.all() # Metodo para llamar a los archivos de la base de datos 'objects'.
+            profesores = Profesor.objects.all() # Metodo para llamar a los archivos de la base de datos 'objects'.
 
-    return render(request,'listaProfesores.html', {'profesores':profesores}) #  Creamos el Html qqeuc ontiene el listado.
+            return render(request,'listaProfesores.html', {'profesores':profesores}) #  Creamos el Html qqeuc ontiene el listado.
+        else:
+            return render (request,"inicio.html",{"mensaje": f'No eres un profesor'})
+        
+    except:
+
+        return render (request,"inicio.html",{"mensaje": f'No eres un profesor'})
 
 # Creat - Creamos un profesor.
 # Request tipos POST: para actualizar un recurso del servidor.
@@ -101,24 +117,52 @@ def lista_profesores(request):
 
 def crea_profesor(request):
         
-    if request.method == "POST" :
-        
-        miFormulario = ProfesorFormulario(request.POST) # Agregamos los formularios de Django.
+    if request.method == 'POST': 
 
-        if miFormulario.is_valid(): # Validacion del forulario.
+        info = request.POST  # EStamos generando accesos especificos para el profesor,
+        
+        miFormulario = ProfesorFormulario({
+            'nombre' : info['nombre'],
+            'apellido' : info['apellido'],
+            'email' : info['email'],
+            'profesion' : info['profesion']
+                            
+        }) # Agregamos los formularios de Django.
+
+        userForm = UserCreationForm({
+            'username' : info['username'],
+            'password1' : info['password1'],
+            'password2' : info['password2'],
+                            
+        }) # Agregamos los formularios de Django.
+
+        if miFormulario.is_valid() and userForm.is_valid(): # Validacion del formulario.
 
             data = miFormulario.cleaned_data # cleaned_da es donde se guarda la iinfo.
 
-            profesor = Profesor(nombre=data['nombre'], apellido=data['apellido'],email=data['email'], profesion=data['profesion']) # Cargamos los datos del formulario
+            data.update(userForm.cleaned_data)
+
+            user = User(username=data['username'])
+
+            user.set_password(data['password1'])
+
+            profesor = Profesor(nombre=data['nombre'], apellido=data['apellido'],email=data['email'], profesion=data['profesion'],user_id=user) # Cargamos los datos del formulario
+
+            user.save()
 
             profesor.save() # Guardamos el formulario.
 
-            return redirect (inicio) # Retornamos al inicio.
-         
+            return render (request,"inicio.html",{"mensaje": f'Datos actualiados'})
+        
+        return render (request,"inicio.html",{"mensaje": f'No entro en validacion'})
+
     else:
         
-            miformulario = ProfesorFormulario()
-            return render (request,"profesorFormulario.html",{"miformulario": miformulario})
+        miformulario = ProfesorFormulario()
+
+        userForm = UserCreationForm()
+
+        return render (request,"profesorFormulario.html",{'miformulario': miformulario,'userform':userForm})
     
 # Delete - Eliminamos un profesor de la lista.
     
@@ -174,7 +218,8 @@ def edita_profesor(request, id):
 
 # Listado - Genera la lista de cursos.
 
-class CursoList(ListView):
+
+class CursoList(LoginRequiredMixin,ListView): # De esta manera en las clases blockeamos el acceso a todo aquel que no tenga la cuenta.
 
     model = Curso # De donde xportamos los datos.
     template_name = "curso_lista.html"
@@ -216,3 +261,104 @@ class CursoDelete(DeleteView):
     success_url = '/app-code/'
 
     
+# Logion - Registre - 
+
+#Login
+
+def loginView(request):
+
+    if request.method == "POST" :
+        
+        miFormulario = AuthenticationForm(request, data = request.POST)
+
+        if miFormulario.is_valid(): # Validacion del forulario.
+
+
+            usuario = miFormulario.cleaned_data.get('username') # Buscamos la usuario en la base de datos
+            psw = miFormulario.cleaned_data.get('password')  # Buscamos la pasword en la base de datos
+            
+            #  Verificamos que tanto el username and pasword son valiods.
+            user = authenticate(username=usuario, password=psw,) 
+
+            if user is not None:
+
+                login(request,user)
+
+                return render (request,"inicio.html",{"mensaje": f'Bienvenido {usuario}'})
+         
+            else:
+
+                return render (request,"inicio.html",{"mensaje": f'Datos incorrectos'})
+        
+        else:
+
+            return render (request,"inicio.html",{"mensaje": f'Error, Formulario invalido.'})
+        
+    else:
+
+        miFormulario = AuthenticationForm()
+
+        return render (request,"login.html",{"miformulario": miFormulario})
+    
+
+# Registre
+    
+
+def register(request):
+        
+    if request.method == "POST" :
+        
+        miFormulario = UserRegisterForm(request.POST) # Agregamos los formularios de Django.
+
+        if miFormulario.is_valid(): # Validacion del forulario.
+
+            username = miFormulario.cleaned_data ['username'] # cleaned_data es donde se guarda la iinfo.
+
+            miFormulario.save()
+
+            return render (request,"inicio.html",{"mensaje": f'Usuario Creado con exito {username}'})
+        
+        else:
+
+            return render (request,"inicio.html",{"mensaje": f'Error al crear el usuario'})
+         
+    else:
+        
+            miformulario = UserRegisterForm()
+            return render (request,"registro.html",{"miformulario": miformulario})
+    
+
+# Logaut
+        
+
+
+# Editar perfil
+
+def editar_perfil(request):
+        
+    usuario = request.user # Devuelve un solo registro.
+
+    if request.method == "POST" :
+        
+        miFormulario = UserEditForm(request.POST) # Agregamos los formularios de Django.
+
+        if miFormulario.is_valid(): # Validacion del forulario.
+
+            data = miFormulario.cleaned_data # cleaned_da es donde se guarda la iinfo.
+
+            usuario.first_name = data["first_name"]
+            usuario.last_name = data["last_name"]
+            usuario.email = data["email"]
+
+
+            usuario.save() # Guardamos el formulario.
+
+            return render (request,"inicio.html",{"mensaje": f'Datos actualiados'})
+        
+        return render (request,"editarPerfil.html",{"mensaje": f'Error en contraseñas'})
+    else:
+        
+        miFormulario = UserEditForm(instance=request.user)
+
+        return render (request,"editarPerfil.html",{"miFormulario": miFormulario})
+        
